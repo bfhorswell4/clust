@@ -2,7 +2,10 @@ package com.example.clust;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -10,7 +13,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -28,6 +38,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         addLocationButton = findViewById(R.id.addLocationButton);
+
+        addLocationButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Testing Add Location!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     /**
