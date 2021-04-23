@@ -14,6 +14,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
@@ -76,12 +77,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 // Hardcode static cluster count for now for testing until we add a number input field
                 int k = 2;
+                mMap.clear();
+                float[] colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_RED};
                 ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, k);
+
+                // For each of our clusters, associate a colour with it and add the locations to the map
                 for(int c = 0; c < clusters.size(); c++){
-                    Log.i("KMEANS", "Cluster=" + c);
-                    ArrayList<LatLng> locations = clusters.get(c).getLocations();
-                    for(int l = 0; l < locations.size(); l++){
-                        Log.i("KMEANS", "Location=" + locations.get(l).toString());
+                    ArrayList<LatLng> locs = clusters.get(c).getLocations();
+                    float colour = colours[c];
+                    for(int l = 0; l < locs.size(); l++){
+                        mMap.addMarker(new MarkerOptions()
+                                .position(locs.get(l))
+                                .icon(BitmapDescriptorFactory.defaultMarker(colour)));
+
                     }
                 }
             }
