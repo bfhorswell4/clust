@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
 
     private static int AUTOCOMPLETE_REQUEST_CODE = 1;
     private GoogleMap mMap;
@@ -47,63 +47,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Initialise buttons and their listeners
         addLocationButton = findViewById(R.id.addLocationButton);
         clusterLocationsButton = findViewById(R.id.clusterLocationsButton);
+        addLocationButton.setOnClickListener(this);
+        clusterLocationsButton.setOnClickListener(this);
 
+        // Initialise Places API
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         currLocations = new ArrayList<>();
-
-        addLocationButton.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View v) {
-                // Set fields for what type of place data should be returned on user selection
-                List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
-                        Place.Field.LAT_LNG, Place.Field.NAME);
-
-                // Starts up an autocomplete intent
-                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
-                        fieldList).build(MapsActivity.this);
-                startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
-            }
-        });
-
-
-        // TESTING FOR K MEANS
-
-        clusterLocationsButton.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View v) {
-                // Hardcode static cluster count for now for testing until we add a number input field
-                int k = 2;
-                mMap.clear();
-                float[] colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_RED};
-                ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, k);
-
-                // For each of our clusters, associate a colour with it and add the locations to the map
-                for(int c = 0; c < clusters.size(); c++){
-                    ArrayList<LatLng> locs = clusters.get(c).getLocations();
-                    float colour = colours[c];
-                    for(int l = 0; l < locs.size(); l++){
-                        mMap.addMarker(new MarkerOptions()
-                                .position(locs.get(l))
-                                .icon(BitmapDescriptorFactory.defaultMarker(colour)));
-
-                    }
-                }
-            }
-        });
     }
 
     /**
-     * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -125,11 +81,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Handle the error
                 Status status = Autocomplete.getStatusFromIntent(data);
                 Toast.makeText(getApplicationContext(), status.getStatusMessage(), Toast.LENGTH_LONG).show();
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation
             }
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * A generic handler to handle different onClick events for specific Buttons
+     */
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.addLocationButton:
+                handleAddLocationClick();
+                break;
+            case R.id.clusterLocationsButton:
+                handleClusterLocationsClick();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Handles a user clicking the add location button
+     */
+    private void handleAddLocationClick(){
+        // Set fields for what type of place data should be returned on user selection
+        List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
+                Place.Field.LAT_LNG, Place.Field.NAME);
+
+        // Starts up an autocomplete intent
+        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
+                fieldList).build(MapsActivity.this);
+        startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+    }
+
+    /**
+     * Handles a user clicking the cluster locations button
+     */
+    private void handleClusterLocationsClick(){
+        // Hardcode static cluster count for now for testing until we add a number input field
+        int k = 2;
+        mMap.clear();
+        float[] colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_RED};
+        ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, k);
+
+        // For each of our clusters, associate a colour with it and add the locations to the map
+        for(int c = 0; c < clusters.size(); c++){
+            ArrayList<LatLng> locs = clusters.get(c).getLocations();
+            float colour = colours[c];
+            for(int l = 0; l < locs.size(); l++){
+                mMap.addMarker(new MarkerOptions()
+                        .position(locs.get(l))
+                        .icon(BitmapDescriptorFactory.defaultMarker(colour)));
+
+            }
+        }
     }
 }

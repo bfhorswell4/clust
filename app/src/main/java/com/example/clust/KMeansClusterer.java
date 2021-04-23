@@ -11,9 +11,10 @@ import java.util.ArrayList;
 public class KMeansClusterer {
 
     /**
-     * Clusters a list of locations
-     * @param locations The locations we want to cluster
-     * @param k The amount of clusters we want
+     * Merges a list of locations into k clusters via K Means Clustering
+     * @param locations The locations to cluster together
+     * @param k The amount of clusters to generate
+     * @return An ArrayList of Cluster objects
      */
     public static ArrayList<Cluster> clusterLocations(ArrayList<LatLng> locations, int k) {
         // Initially each cluster is made from a single location

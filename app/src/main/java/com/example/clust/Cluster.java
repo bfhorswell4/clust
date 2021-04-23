@@ -25,7 +25,7 @@ public class Cluster {
 
     /**
      * This method calculates the center of the cluster
-     * @return The center coordinates of the cluster
+     * @return The center of the cluster
      */
     public LatLng getCenter(){
         if(this.locations.size()==1){
@@ -42,7 +42,7 @@ public class Cluster {
 
     /**
      * A getter for the clusters locations
-     * @return The clusters associated locations
+     * @return The locations associated with the cluster
      */
     public ArrayList<LatLng> getLocations(){
         return this.locations;
