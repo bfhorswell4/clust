@@ -22,6 +22,7 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static int AUTOCOMPLETE_REQUEST_CODE = 1;
     private GoogleMap mMap;
     FloatingActionButton addLocationButton;
+    private ArrayList<LatLng> currLocations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         addLocationButton = findViewById(R.id.addLocationButton);
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
+        currLocations = new ArrayList<>();
 
         addLocationButton.setOnClickListener(new View.OnClickListener(){
 
@@ -71,20 +74,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                // Result succeeded
+                // Result succeeded, adding location to map
                 Place place = Autocomplete.getPlaceFromIntent(data);
-                Toast.makeText(getApplicationContext(), "Place: " + place.getName() + ", " + place.getId(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Place: " + place.getName() + ", " + place.getLatLng().toString(), Toast.LENGTH_LONG).show();
+                currLocations.add(place.getLatLng());
+                mMap.addMarker(new MarkerOptions()
+                        .position(place.getLatLng())
+                        .title("Marker"));
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // Handle the error
                 Status status = Autocomplete.getStatusFromIntent(data);
