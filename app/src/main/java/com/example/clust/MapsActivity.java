@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +40,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -45,6 +48,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         addLocationButton = findViewById(R.id.addLocationButton);
         clusterLocationsButton = findViewById(R.id.clusterLocationsButton);
+
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         currLocations = new ArrayList<>();
 
@@ -65,6 +69,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         // TESTING FOR K MEANS
+
+        clusterLocationsButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                // Hardcode static cluster count for now for testing until we add a number input field
+                int k = 2;
+                ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, k);
+                for(int c = 0; c < clusters.size(); c++){
+                    Log.i("KMEANS", "Cluster=" + c);
+                    ArrayList<LatLng> locations = clusters.get(c).getLocations();
+                    for(int l = 0; l < locations.size(); l++){
+                        Log.i("KMEANS", "Location=" + locations.get(l).toString());
+                    }
+                }
+            }
+        });
     }
 
     /**

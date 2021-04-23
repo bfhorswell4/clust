@@ -39,7 +39,7 @@ public class KMeansClusterer {
             // Merge these two clusters that are closest into a single cluster
             Cluster cI = clusters.get(minI);
             Cluster cJ = clusters.get(minJ);
-            cJ.locations.addAll(cI.locations);
+            cJ.addLocations(cI.getLocations());
             clusters.remove(cI);
         }
 

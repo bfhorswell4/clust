@@ -3,14 +3,15 @@ package com.example.clust;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
  * A class that represents a group of LatLng locations
  */
 public class Cluster {
-    ArrayList<LatLng> locations;
-    LatLng center;
+    private ArrayList<LatLng> locations;
+    private LatLng center;
 
     /**
      * Initialises a Cluster
@@ -32,5 +33,13 @@ public class Cluster {
         }
 
        return this.locations.get(0);
+    }
+
+    public ArrayList<LatLng> getLocations(){
+        return this.locations;
+    }
+
+    public void addLocations(ArrayList<LatLng> new_locations){
+        this.locations.addAll(new_locations);
     }
 }
