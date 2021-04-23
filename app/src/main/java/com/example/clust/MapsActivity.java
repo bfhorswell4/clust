@@ -60,6 +60,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
             }
         });
+
+
+        // TESTING FOR K MEANS
     }
 
     /**
