@@ -31,6 +31,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static int AUTOCOMPLETE_REQUEST_CODE = 1;
     private GoogleMap mMap;
     FloatingActionButton addLocationButton;
+    FloatingActionButton clusterLocationsButton;
     private ArrayList<LatLng> currLocations;
 
     @Override
@@ -43,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         addLocationButton = findViewById(R.id.addLocationButton);
+        clusterLocationsButton = findViewById(R.id.clusterLocationsButton);
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         currLocations = new ArrayList<>();
 
