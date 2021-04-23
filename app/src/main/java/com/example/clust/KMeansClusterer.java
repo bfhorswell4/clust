@@ -5,20 +5,36 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
+/**
+ * A class to hold our K Means Clustering algorithm logic
+ */
 public class KMeansClusterer {
 
+    /**
+     * Clusters a list of locations
+     * @param locations The locations we want to cluster
+     * @param k The amount of clusters we want
+     */
     public static ArrayList<Cluster> clusterLocations(ArrayList<LatLng> locations, int k) {
+        // Initially each cluster is made from a single location
         ArrayList<Cluster> clusters = new ArrayList<>();
         for (int i = 0; i < locations.size(); i++) {
             clusters.add(new Cluster(locations.get(i)));
         }
 
+        // It's not possible to have more clusters than locations,
+        // so in this edge case we just return
+        if(k > locations.size()){
+            return clusters;
+        }
+
+        // Loop the algorithm until we have our desired amount of clusters
         while (clusters.size() != k) {
             double minDistance = Double.MAX_VALUE;
             int minI = 0;
             int minJ = 0;
 
-            // Computethe  distances between all cluster centers and
+            // Compute the  distances between all cluster centers and
             // find the Ith and Jth clusters that are closest
             for (int i = 0; i < clusters.size(); i++) {
                 for (int j = 0; j < clusters.size(); j++) {
