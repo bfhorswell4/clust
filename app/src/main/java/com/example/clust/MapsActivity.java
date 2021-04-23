@@ -36,8 +36,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
         addLocationButton = findViewById(R.id.addLocationButton);
+        Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
 
         addLocationButton.setOnClickListener(new View.OnClickListener(){
 
