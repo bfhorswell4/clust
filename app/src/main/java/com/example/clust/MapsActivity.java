@@ -92,6 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .position(place.getLatLng())
                         .title("Marker"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 5));
+                Log.i(TAG, "Location Added: " + place.getLatLng().toString() + "," + place.getAddress());
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // Handle the error
                 Status status = Autocomplete.getStatusFromIntent(data);
@@ -123,6 +124,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Handles a user clicking the add location button
      */
     private void handleAddLocationClick(){
+        Log.i(TAG, "Add Location Button Clicked");
+
         // Set fields for what type of place data should be returned on user selection
         List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
                 Place.Field.LAT_LNG, Place.Field.NAME);
@@ -137,9 +140,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Handles a user clicking the cluster locations button
      */
     private void handleClusterLocationsClick(){
+        Log.i(TAG, "Cluster Locations button clicked");
+
         // Create a dialog with a numerical input for setting cluster number
         AlertDialog.Builder dialog = new AlertDialog.Builder(MapsActivity.this);
-        dialog.setTitle("How many clusters?");
+        dialog.setTitle("How many days long is your trip?");
         final EditText numberInput = new EditText(MapsActivity.this);
         numberInput.setInputType(InputType.TYPE_CLASS_NUMBER);
         dialog.setView(numberInput);
@@ -149,8 +154,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int clusterCount = Integer.valueOf(numberInput.getText().toString());
+                Log.i(TAG, "Cluster Count in Numerical Input: " + clusterCount);
                 mMap.clear();
-                //float[] colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_MAGENTA, BitmapDescriptorFactory.HUE_RED};
                 ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
 
                 // For each of our clusters, associate a colour with it and add the locations to the map
@@ -161,7 +166,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMap.addMarker(new MarkerOptions()
                                 .position(locs.get(l))
                                 .icon(BitmapDescriptorFactory.defaultMarker(colour)));
-
                     }
                 }
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(clusters.get(0).getCenter(), 1));
