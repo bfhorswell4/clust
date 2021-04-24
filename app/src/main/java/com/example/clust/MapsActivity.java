@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -35,7 +36,13 @@ import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
 
-    private static int AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final String TAG = "MapsActivity";
+    private static final float[] marker_colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_MAGENTA,
+            BitmapDescriptorFactory.HUE_CYAN, BitmapDescriptorFactory.HUE_BLUE, BitmapDescriptorFactory.HUE_GREEN,
+            BitmapDescriptorFactory.HUE_ORANGE, BitmapDescriptorFactory.HUE_ROSE, BitmapDescriptorFactory.HUE_VIOLET,
+            BitmapDescriptorFactory.HUE_YELLOW};
+
     private GoogleMap mMap;
     FloatingActionButton addLocationButton;
     FloatingActionButton clusterLocationsButton;
@@ -80,7 +87,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (resultCode == RESULT_OK) {
                 // Result succeeded, adding location to map
                 Place place = Autocomplete.getPlaceFromIntent(data);
-                Toast.makeText(getApplicationContext(), "Place: " + place.getName() + ", " + place.getLatLng().toString(), Toast.LENGTH_LONG).show();
                 currLocations.add(place.getLatLng());
                 mMap.addMarker(new MarkerOptions()
                         .position(place.getLatLng())
@@ -89,7 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // Handle the error
                 Status status = Autocomplete.getStatusFromIntent(data);
-                Toast.makeText(getApplicationContext(), status.getStatusMessage(), Toast.LENGTH_LONG).show();
+                Log.e(TAG, status.getStatusMessage());
             }
             return;
         }
@@ -144,13 +150,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(DialogInterface dialog, int which) {
                 int clusterCount = Integer.valueOf(numberInput.getText().toString());
                 mMap.clear();
-                float[] colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_MAGENTA, BitmapDescriptorFactory.HUE_RED};
+                //float[] colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_MAGENTA, BitmapDescriptorFactory.HUE_RED};
                 ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
 
                 // For each of our clusters, associate a colour with it and add the locations to the map
                 for(int c = 0; c < clusters.size(); c++){
                     ArrayList<LatLng> locs = clusters.get(c).getLocations();
-                    float colour = colours[c];
+                    float colour = marker_colours[c];
                     for(int l = 0; l < locs.size(); l++){
                         mMap.addMarker(new MarkerOptions()
                                 .position(locs.get(l))
