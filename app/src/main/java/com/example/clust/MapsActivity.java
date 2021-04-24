@@ -46,6 +46,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     FloatingActionButton addLocationButton;
     FloatingActionButton clusterLocationsButton;
+    FloatingActionButton resetButton;
     private ArrayList<LatLng> currLocations;
 
     @Override
@@ -61,8 +62,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Initialise buttons and their listeners
         addLocationButton = findViewById(R.id.addLocationButton);
         clusterLocationsButton = findViewById(R.id.clusterLocationsButton);
+        resetButton = findViewById(R.id.resetButton);
         addLocationButton.setOnClickListener(this);
         clusterLocationsButton.setOnClickListener(this);
+        resetButton.setOnClickListener(this);
 
         // Initialise Places API
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
@@ -114,6 +117,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case R.id.clusterLocationsButton:
                 handleClusterLocationsClick();
                 break;
+            case R.id.resetButton:
+                handleResetClick();
             default:
                 break;
         }
@@ -185,5 +190,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Start the dialog
         dialog.show();
+    }
+
+    /**
+     * Handles a user resetting the map back to an empty state
+     */
+    private void handleResetClick(){
+        currLocations.clear();
+        mMap.clear();
     }
 }
