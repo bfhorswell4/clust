@@ -3,10 +3,14 @@ package com.example.clust;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
@@ -122,22 +126,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Handles a user clicking the cluster locations button
      */
     private void handleClusterLocationsClick(){
-        // Hardcode static cluster count for now for testing until we add a number input field
-        int k = 2;
-        mMap.clear();
-        float[] colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_RED};
-        ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, k);
+        // Create a dialog with a numerical input for setting cluster number
+        AlertDialog.Builder dialog = new AlertDialog.Builder(MapsActivity.this);
+        dialog.setTitle("How many clusters?");
+        final EditText numberInput = new EditText(MapsActivity.this);
+        numberInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        dialog.setView(numberInput);
 
-        // For each of our clusters, associate a colour with it and add the locations to the map
-        for(int c = 0; c < clusters.size(); c++){
-            ArrayList<LatLng> locs = clusters.get(c).getLocations();
-            float colour = colours[c];
-            for(int l = 0; l < locs.size(); l++){
-                mMap.addMarker(new MarkerOptions()
-                        .position(locs.get(l))
-                        .icon(BitmapDescriptorFactory.defaultMarker(colour)));
+        // Set the dialog to have an OK button which will start location clustering
+        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int clusterCount = Integer.valueOf(numberInput.getText().toString());
+                mMap.clear();
+                float[] colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_MAGENTA, BitmapDescriptorFactory.HUE_RED};
+                ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
 
+                // For each of our clusters, associate a colour with it and add the locations to the map
+                for(int c = 0; c < clusters.size(); c++){
+                    ArrayList<LatLng> locs = clusters.get(c).getLocations();
+                    float colour = colours[c];
+                    for(int l = 0; l < locs.size(); l++){
+                        mMap.addMarker(new MarkerOptions()
+                                .position(locs.get(l))
+                                .icon(BitmapDescriptorFactory.defaultMarker(colour)));
+
+                    }
+                }
             }
-        }
+        });
+
+        // Set the dialog to have a cancel button
+        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();;
+            }
+        });
+
+        // Start the dialog
+        dialog.show();
     }
 }
