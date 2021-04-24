@@ -81,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.addMarker(new MarkerOptions()
                         .position(place.getLatLng())
                         .title("Marker"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 5));
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // Handle the error
                 Status status = Autocomplete.getStatusFromIntent(data);
@@ -153,6 +154,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
                 }
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(clusters.get(0).getCenter(), 1));
             }
         });
 
