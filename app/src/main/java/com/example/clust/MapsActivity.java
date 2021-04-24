@@ -159,12 +159,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(DialogInterface dialog, int which) {
                 int clusterCount = Integer.valueOf(numberInput.getText().toString());
                 Log.i(TAG, "Cluster Count in Numerical Input: " + clusterCount);
-                mMap.clear();
-                ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
 
                 if(clusterCount > 8 || clusterCount < 1){
                     Toast.makeText(getApplicationContext(), "Enter a number of days between 1 and 8", Toast.LENGTH_LONG).show();
                 }else{
+                    mMap.clear();
+                    ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
                     // For each of our clusters, associate a colour with it and add the locations to the map
                     for(int c = 0; c < clusters.size(); c++){
                         ArrayList<LatLng> locs = clusters.get(c).getLocations();
@@ -175,7 +175,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     .icon(BitmapDescriptorFactory.defaultMarker(colour)));
                         }
                     }
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(clusters.get(0).getCenter(), 1));
                 }
             }
         });
