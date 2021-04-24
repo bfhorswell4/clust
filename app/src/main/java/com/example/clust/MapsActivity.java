@@ -69,7 +69,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currLocations = new ArrayList<>();
 
         Tracker tracker = SnowplowTrackerBuilder.getTracker(this.getApplicationContext());
-        tracker.track(ScreenView.builder().name("screenName").build());
 
     }
 
@@ -158,17 +157,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
                 ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
 
-                // For each of our clusters, associate a colour with it and add the locations to the map
-                for(int c = 0; c < clusters.size(); c++){
-                    ArrayList<LatLng> locs = clusters.get(c).getLocations();
-                    float colour = marker_colours[c];
-                    for(int l = 0; l < locs.size(); l++){
-                        mMap.addMarker(new MarkerOptions()
-                                .position(locs.get(l))
-                                .icon(BitmapDescriptorFactory.defaultMarker(colour)));
+                if(clusterCount > 8 || clusterCount < 1){
+                    Toast.makeText(getApplicationContext(), "Enter a number of days between 1 and 8", Toast.LENGTH_LONG).show();
+                }else{
+                    // For each of our clusters, associate a colour with it and add the locations to the map
+                    for(int c = 0; c < clusters.size(); c++){
+                        ArrayList<LatLng> locs = clusters.get(c).getLocations();
+                        float colour = marker_colours[c];
+                        for(int l = 0; l < locs.size(); l++){
+                            mMap.addMarker(new MarkerOptions()
+                                    .position(locs.get(l))
+                                    .icon(BitmapDescriptorFactory.defaultMarker(colour)));
+                        }
                     }
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(clusters.get(0).getCenter(), 1));
                 }
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(clusters.get(0).getCenter(), 1));
             }
         });
 
