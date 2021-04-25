@@ -201,6 +201,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Handles a user resetting the map back to an empty state
      */
     private void handleResetClick(){
+        TrackerEvents.trackResetMapEvent(tracker, currLocations.size());
         currLocations.clear();
         mMap.clear();
     }

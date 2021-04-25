@@ -20,8 +20,8 @@ import java.util.UUID;
  */
 public class TrackerEvents {
 
-    public static void trackStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
-        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
+    public static void trackResetMapEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker, int amountOfLocations) {
+        tracker.track(Structured.builder().category("Map").action("Resetting Locations").value((double)amountOfLocations).build());
     }
 
     public static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
