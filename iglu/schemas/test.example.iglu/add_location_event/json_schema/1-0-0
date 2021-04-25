@@ -9,11 +9,24 @@
   },
   "type": "object",
   "properties": {
-    "locationName": {
+    "name": {
       "type": "string",
       "maxLength": 255
+    },
+    "lat":{
+      "type": "number",
+      "maximum": 90,
+      "minimum": -90
+    },
+    "lng": {
+      "type": "number",
+      "maximum": 180,
+      "minimum": -180
+    },
+    "address": {
+      "type": "string"
     }
   },
-  "required": ["locationName"],
+  "required": ["name", "lat", "lng", "address"],
   "additionalProperties": false
 }
