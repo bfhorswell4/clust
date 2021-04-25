@@ -9,11 +9,11 @@
   },
   "type": "object",
   "properties": {
-    "name": {
+    "locationName": {
       "type": "string",
       "maxLength": 255
     }
   },
-  "required": ["name"],
+  "required": ["locationName"],
   "additionalProperties": false
 }
