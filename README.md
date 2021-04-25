@@ -6,7 +6,10 @@ has Snowplow tracking embedded in it!
 ## Introduction
 **Clust** is a small android app that utilises the **Google Maps/Places API** to provide a map upon which you can add potential sightseeing locations that you want 
 to visit on a trip. You can then click the clustering button and enter how many days long your trip is (for now between 1 and 8!). The app then uses a little algorithm known 
-as K Means Clustering to optimally group your locations so that you can visit those closest each other on the same day. This way you don't waste lots of time travelling between locations that are far from each other! Finally there's a reset button so you can clear the map and start over :)
+as K Means Clustering to optimally group your locations so that you can visit those closest each other on the same day. This way you don't waste lots of time travelling between locations that are far from each other! Finally there's a reset button so you can clear the map and start over :) Below is an example of some popular sights in London that have
+been clustered for a 3 day trip. 
+
+![alt text](https://github.com/bfhorswell4/clust/blob/master/example_images/before_clustering.png)           ![alt text](https://github.com/bfhorswell4/clust/blob/master/example_images/after_clustering.png)
 
 
 
