@@ -1,0 +1,59 @@
+{
+  "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+  "description": "Schema for a cluster locations event",
+  "self": {
+    "vendor": "test.example",
+    "name": "cluster_locations_event",
+    "format": "jsonschema",
+    "version": "1-0-0"
+  },
+  "type": "object",
+  "properties": {
+    "clusters": {
+      "type": "array",
+      "maxItems": 8,
+      "minItems": 1,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "cluster_center": {
+              "type": "string"
+            },
+            "locations": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "required": ["lat", "lng"],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "maxLength": 255
+                    },
+                    "lat": {
+                      "type": "number",
+                      "maximum": 90,
+                      "minimum": -90
+                    },
+                    "lng": {
+                      "type": "number",
+                      "maximum": 180,
+                      "minimum": -180
+                    },
+                    "address": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+
+      ]
+    }
+  },
+  "required": ["clusters"],
+  "additionalProperties": false
+}

@@ -1,5 +1,6 @@
 package com.example.clust;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
@@ -7,6 +8,8 @@ import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
 import com.snowplowanalytics.snowplow.tracker.events.Structured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -21,17 +24,48 @@ public class TrackerEvents {
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
     }
 
-    private static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
-        tracker.track(ScreenView.builder().name("screenName1").id(UUID.randomUUID().toString()).build());
+    public static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+        tracker.track(ScreenView.builder().name("MapActivityScreen").id(UUID.randomUUID().toString()).build());
     }
 
     public static void trackAddLocationEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker, Place place) {
         Map<String, Object> attributes = new HashMap<>();
+
         attributes.put("name", place.getName());
         attributes.put("address", place.getAddress());
         attributes.put("lat", place.getLatLng().latitude);
         attributes.put("lng", place.getLatLng().longitude);
+
         SelfDescribingJson test = new SelfDescribingJson("iglu:test.example.iglu/add_location_event/json_schema/1-0-0", attributes);
+        tracker.track(SelfDescribing.builder().eventData(test).build());
+    }
+
+    public static void trackClusterLocationsEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker, ArrayList<Cluster> clusters) {
+        Map<String, ArrayList<Object>> attributes = new HashMap<>();
+        ArrayList<Object> cluster_objs = new ArrayList<>();
+
+        for(int c = 0; c < clusters.size(); c++){
+            Cluster cluster = clusters.get(c);
+            HashMap<String, Object> cluster_obj = new HashMap<>();
+            ArrayList<LatLng> locs = clusters.get(c).getLocations();
+            ArrayList<Object> loc_objs = new ArrayList<>();
+
+            cluster_obj.put("cluster_center", cluster.getCenter().toString());
+
+
+            for(int l = 0; l < locs.size(); l++){
+                LatLng loc = locs.get(l);
+                Map<String, Object> loc_obj = new HashMap<>();
+                loc_obj.put("lat", loc.latitude);
+                loc_obj.put("lng", loc.longitude);
+                loc_objs.add(loc_obj);
+            }
+            cluster_obj.put("locations", loc_objs);
+            cluster_objs.add(cluster_obj);
+        }
+
+        attributes.put("clusters", cluster_objs);
+        SelfDescribingJson test = new SelfDescribingJson("iglu:test.example.iglu/cluster_locations_event/json_schema/1-0-0", attributes);
         tracker.track(SelfDescribing.builder().eventData(test).build());
     }
 }
