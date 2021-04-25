@@ -169,6 +169,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }else{
                     mMap.clear();
                     ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
+                    TrackerEvents.trackClusterLocationsEvent(tracker, clusters);
+
                     // For each of our clusters, associate a colour with it and add the locations to the map
                     for(int c = 0; c < clusters.size(); c++){
                         ArrayList<LatLng> locs = clusters.get(c).getLocations();
