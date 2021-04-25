@@ -71,7 +71,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         currLocations = new ArrayList<>();
 
+        // Initialise Snowplow Tracking
         Tracker tracker = SnowplowTrackerBuilder.getTracker(this.getApplicationContext());
+        TrackerEvents.trackAll(tracker);
 
     }
 
