@@ -11,7 +11,6 @@ import java.util.ArrayList;
  */
 public class Cluster {
     private ArrayList<Place> locations;
-    private LatLng center;
 
     /**
      * Initialises a Cluster
@@ -20,7 +19,6 @@ public class Cluster {
     public Cluster(Place location){
         locations = new ArrayList<>();
         locations.add(location);
-        center = location.getLatLng();
     }
 
     /**

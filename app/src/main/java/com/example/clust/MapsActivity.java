@@ -34,27 +34,29 @@ import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
 
+    // Useful static definitions
     private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final String TAG = "MapsActivity";
-    private static final float[] marker_colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_MAGENTA,
+    private static final float[] MARKER_COLOURS = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_MAGENTA,
             BitmapDescriptorFactory.HUE_CYAN, BitmapDescriptorFactory.HUE_BLUE, BitmapDescriptorFactory.HUE_GREEN,
             BitmapDescriptorFactory.HUE_ORANGE, BitmapDescriptorFactory.HUE_ROSE, BitmapDescriptorFactory.HUE_VIOLET,
             BitmapDescriptorFactory.HUE_YELLOW};
 
+    // UI elements
     private GoogleMap mMap;
-    private Tracker tracker;
-    private ArrayList<Place> currLocations;
-
     FloatingActionButton addLocationButton;
     FloatingActionButton clusterLocationsButton;
     FloatingActionButton resetButton;
+
+    private Tracker tracker;
+    private ArrayList<Place> currLocations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -85,7 +87,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        // Handle our autocomplete response from a location adding attempt
+        // Handle our location autocomplete intent response
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // Result succeeded, adding location to map
@@ -110,7 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * A generic handler to handle different onClick events for various buttons
+     * A generic handler to route onClick methods for various buttons
      */
     @Override
     public void onClick(View v) {
@@ -138,7 +140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
                 Place.Field.LAT_LNG, Place.Field.NAME);
 
-        // Starts up an autocomplete intent
+        // Starts up a location autocomplete intent
         Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
                 fieldList).build(MapsActivity.this);
         startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
@@ -150,17 +152,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void handleClusterLocationsClick(){
         Log.i(TAG, "Cluster Locations button clicked");
 
-        // Create a dialog with a numerical input for setting cluster amount
+        // Create a dialog with a numerical input for setting cluster number
         AlertDialog.Builder dialog = new AlertDialog.Builder(MapsActivity.this);
         dialog.setTitle("How many days long is your trip?");
         final EditText numberInput = new EditText(MapsActivity.this);
         numberInput.setInputType(InputType.TYPE_CLASS_NUMBER);
         dialog.setView(numberInput);
 
-        // Set the dialog to have an OK button which will start location clustering
+        // Set the dialog to have an OK button which will being clustering
         dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                // Grab the number of clusters desired
                 int clusterCount = Integer.valueOf(numberInput.getText().toString());
                 Log.i(TAG, "Cluster Count in Numerical Input: " + clusterCount);
 
@@ -168,14 +171,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(getApplicationContext(),
                             "Enter a number of days between 1 and 8", Toast.LENGTH_LONG).show();
                 }else{
-                    mMap.clear();
+                    // Calculate clustering
                     ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
                     TrackerEvents.trackClusterLocationsEvent(tracker, clusters);
+                    mMap.clear();
 
                     // For each of our clusters, associate a colour with it and add the locations to the map
                     for(int c = 0; c < clusters.size(); c++){
                         ArrayList<Place> locs = clusters.get(c).getLocations();
-                        float colour = marker_colours[c];
+                        float colour = MARKER_COLOURS[c];
 
                         for(int l = 0; l < locs.size(); l++){
                             mMap.addMarker(new MarkerOptions()

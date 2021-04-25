@@ -5,21 +5,25 @@ import com.snowplowanalytics.snowplow.tracker.emitter.HttpMethod;
 import android.content.Context;
 
 /**
- * A class that builds a SnowPlow Tracker
+ * A class that builds a SnowPlow Tracker for our Android application
  */
 public class SnowplowTrackerBuilder {
+
     /**
-     * A method to build the Tracker for our applicaiton
+     * A method to retrieve the tracker
+     * @param context Our application context
+     * @return A SnowPlow android tracker
      */
     public static Tracker getTracker(Context context) {
         Emitter emitter = getEmitter(context);
-        Subject subject = getSubject(context); // Optional
+        Subject subject = getSubject(context);
 
         return Tracker.init(new Tracker.TrackerBuilder(emitter, "Clust", "ClustID", context)
                 .lifecycleEvents(true)
+                .applicationCrash(true)
                 .geoLocationContext(true)
                 .installTracking(true)
-                .subject(subject) // Optional
+                .subject(subject)
                 .build()
         );
     }

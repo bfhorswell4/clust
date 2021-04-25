@@ -60,9 +60,11 @@ public class KMeansClusterer {
                 LatLng centerI = clusters.get(i).getCenter();
                 LatLng centerJ = clusters.get(j).getCenter();
 
+                // Our distance measurement is simply in meters
                 float [] dist_results = new float[5];
                 Location.distanceBetween(centerI.latitude, centerI.longitude, centerJ.latitude, centerJ.longitude, dist_results);
                 float dist = dist_results[0];
+
                 if (dist < minDistance && dist != 0) {
                     minI = i;
                     minJ = j;
