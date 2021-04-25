@@ -20,7 +20,7 @@ been clustered for a 3 day trip in the app:
 When implementing tracking I tried to think of what data might be useful to analyse if this was to be developed into a fully productised travel planning app. Initially I added some default auto-tracking features that come with the Android tracker, such as install tracking  as well as Google Analytics-style structured events.
 
 However I also tried to think of some custom events that I could define myself via asscoiated schemas etc. In the end I decided on two I thought could be potentially useful and important:
-  - `add_location_event`: An event that triggeres everytime a user adds a potential place they want to vsit on their trip to the map. By tracking locational data, I thought this could be useful in beginning to discern useful data that could inform tourism, such as what locations are popular hotspots with users.
+  - `add_location_event`: An event that triggers everytime a user adds a potential place they want to visit on their trip to the map. By tracking locational data, I thought this could be useful in beginning to discern useful data that could inform tourism, such as what locations are popular hotspots with users.
   - `cluster_locations_event`: An event that is fired whenever a user clusters their locations. I thought this would be useful to provide some more complex and nuanced data about users travel plans, such as how popular locations are grouped in relation to each other e.g it could be useful to know that Big Ben and the London Eye are popular locations that are very near to each other to provide some sort of tie in tourist experience!
   
 
