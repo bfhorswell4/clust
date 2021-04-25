@@ -19,7 +19,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -27,19 +26,28 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.snowplowanalytics.snowplow.tracker.Tracker;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
 
-    private static int AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final int AUTOCOMPLETE_REQUEST_CODE = 1;
+    private static final String TAG = "MapsActivity";
+    private static final float[] marker_colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_MAGENTA,
+            BitmapDescriptorFactory.HUE_CYAN, BitmapDescriptorFactory.HUE_BLUE, BitmapDescriptorFactory.HUE_GREEN,
+            BitmapDescriptorFactory.HUE_ORANGE, BitmapDescriptorFactory.HUE_ROSE, BitmapDescriptorFactory.HUE_VIOLET,
+            BitmapDescriptorFactory.HUE_YELLOW};
+
     private GoogleMap mMap;
+    private Tracker tracker;
+    private ArrayList<Place> currLocations;
+
     FloatingActionButton addLocationButton;
     FloatingActionButton clusterLocationsButton;
-    private ArrayList<LatLng> currLocations;
+    FloatingActionButton resetButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +62,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Initialise buttons and their listeners
         addLocationButton = findViewById(R.id.addLocationButton);
         clusterLocationsButton = findViewById(R.id.clusterLocationsButton);
+        resetButton = findViewById(R.id.resetButton);
         addLocationButton.setOnClickListener(this);
         clusterLocationsButton.setOnClickListener(this);
+        resetButton.setOnClickListener(this);
 
         // Initialise Places API
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         currLocations = new ArrayList<>();
+
+        // Initialise Snowplow tracking
+        tracker = SnowplowTrackerBuilder.getTracker(this.getApplicationContext());
     }
 
     /**
@@ -72,20 +85,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        // Handle our autocomplete response from a location adding attempt
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // Result succeeded, adding location to map
-                Place place = Autocomplete.getPlaceFromIntent(data);
-                Toast.makeText(getApplicationContext(), "Place: " + place.getName() + ", " + place.getLatLng().toString(), Toast.LENGTH_LONG).show();
-                currLocations.add(place.getLatLng());
+                Place location = Autocomplete.getPlaceFromIntent(data);
+                TrackerEvents.trackAddLocationEvent(tracker, location);
+                currLocations.add(location);
+
                 mMap.addMarker(new MarkerOptions()
-                        .position(place.getLatLng())
+                        .position(location.getLatLng())
                         .title("Marker"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 5));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location.getLatLng(), 5));
+
+                Log.i(TAG, "Location Added: " + location.getLatLng().toString() + "," + location.getAddress());
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                // Handle the error
+                // Result threw error
                 Status status = Autocomplete.getStatusFromIntent(data);
-                Toast.makeText(getApplicationContext(), status.getStatusMessage(), Toast.LENGTH_LONG).show();
+                Log.e(TAG, status.getStatusMessage());
             }
             return;
         }
@@ -93,7 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * A generic handler to handle different onClick events for specific Buttons
+     * A generic handler to handle different onClick events for various buttons
      */
     @Override
     public void onClick(View v) {
@@ -104,6 +121,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case R.id.clusterLocationsButton:
                 handleClusterLocationsClick();
                 break;
+            case R.id.resetButton:
+                handleResetClick();
             default:
                 break;
         }
@@ -113,6 +132,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Handles a user clicking the add location button
      */
     private void handleAddLocationClick(){
+        Log.i(TAG, "Add Location Button Clicked");
+
         // Set fields for what type of place data should be returned on user selection
         List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
                 Place.Field.LAT_LNG, Place.Field.NAME);
@@ -127,9 +148,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Handles a user clicking the cluster locations button
      */
     private void handleClusterLocationsClick(){
-        // Create a dialog with a numerical input for setting cluster number
+        Log.i(TAG, "Cluster Locations button clicked");
+
+        // Create a dialog with a numerical input for setting cluster amount
         AlertDialog.Builder dialog = new AlertDialog.Builder(MapsActivity.this);
-        dialog.setTitle("How many clusters?");
+        dialog.setTitle("How many days long is your trip?");
         final EditText numberInput = new EditText(MapsActivity.this);
         numberInput.setInputType(InputType.TYPE_CLASS_NUMBER);
         dialog.setView(numberInput);
@@ -139,22 +162,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int clusterCount = Integer.valueOf(numberInput.getText().toString());
-                mMap.clear();
-                float[] colours = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_MAGENTA, BitmapDescriptorFactory.HUE_RED};
-                ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
+                Log.i(TAG, "Cluster Count in Numerical Input: " + clusterCount);
 
-                // For each of our clusters, associate a colour with it and add the locations to the map
-                for(int c = 0; c < clusters.size(); c++){
-                    ArrayList<LatLng> locs = clusters.get(c).getLocations();
-                    float colour = colours[c];
-                    for(int l = 0; l < locs.size(); l++){
-                        mMap.addMarker(new MarkerOptions()
-                                .position(locs.get(l))
-                                .icon(BitmapDescriptorFactory.defaultMarker(colour)));
+                if(clusterCount > 8 || clusterCount < 1){
+                    Toast.makeText(getApplicationContext(),
+                            "Enter a number of days between 1 and 8", Toast.LENGTH_LONG).show();
+                }else{
+                    mMap.clear();
+                    ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
+                    TrackerEvents.trackClusterLocationsEvent(tracker, clusters);
 
+                    // For each of our clusters, associate a colour with it and add the locations to the map
+                    for(int c = 0; c < clusters.size(); c++){
+                        ArrayList<Place> locs = clusters.get(c).getLocations();
+                        float colour = marker_colours[c];
+
+                        for(int l = 0; l < locs.size(); l++){
+                            mMap.addMarker(new MarkerOptions()
+                                    .position(locs.get(l).getLatLng())
+                                    .icon(BitmapDescriptorFactory.defaultMarker(colour)));
+                        }
                     }
                 }
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(clusters.get(0).getCenter(), 1));
             }
         });
 
@@ -168,5 +197,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Start the dialog
         dialog.show();
+    }
+
+    /**
+     * Handles a user resetting the map back to an empty state
+     */
+    private void handleResetClick(){
+        TrackerEvents.trackResetMapEvent(tracker, currLocations.size());
+        currLocations.clear();
+        mMap.clear();
     }
 }

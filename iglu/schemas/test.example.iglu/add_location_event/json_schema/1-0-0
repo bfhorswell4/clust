@@ -1,0 +1,32 @@
+{
+  "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+  "description": "Schema for an add location event",
+  "self": {
+    "vendor": "test.example",
+    "name": "add_location_event",
+    "format": "jsonschema",
+    "version": "1-0-0"
+  },
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "lat":{
+      "type": "number",
+      "maximum": 90,
+      "minimum": -90
+    },
+    "lng": {
+      "type": "number",
+      "maximum": 180,
+      "minimum": -180
+    },
+    "address": {
+      "type": "string"
+    }
+  },
+  "required": ["name", "lat", "lng", "address"],
+  "additionalProperties": false
+}
