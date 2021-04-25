@@ -3,9 +3,19 @@
 With lockdown slowly lifting and the potential in the future to go travelling again, I thought It'd be fun to make a small app that helps with planning trips abroad + 
 has Snowplow tracking embedded in it! 
 
-Clust is a small android app that utilises the Google Maps/Places API to provide a map where you can add potential locations that you want 
-to visit on your trip. You can then click the clustering button and enter how many days long your trip is (for now between 1 and 8!). The app then uses a little algorithm known 
-as K Means Clustering to optimally group your locations so that you visit those closest each other on the same day! Finally there's a reset button so you can clear the map and start over :)
+## Introduction
+**Clust** is a small android app that utilises the **Google Maps/Places API** to provide a map upon which you can add potential sightseeing locations that you want 
+to visit on a trip. You can then click the clustering button and enter how many days long your trip is (for now between 1 and 8!). The app then uses a little algorithm known 
+as K Means Clustering to optimally group your locations so that you can visit those closest each other on the same day. This way you don't waste lots of time travelling between locations that are far from each other! Finally there's a reset button so you can clear the map and start over :)
+
+
+
+## Data Tracking
+When implementing tracking I tried to think of what data might be useful to track if this was to be developed into a fully fledged app. I added some default auto-tracking features that come with the Android tracker, such as install tracking and application crashes. I also tried to think of some custom events that I myself could define. In the end
+I decided on two I thought were important:
+  - `add_location_event`: An event that tracks locational information everytime a user adds a potential place they want to see on their trip to the map. I thought this could be useful in beginning to discern useful data that could inform tourism, such as what locations are popular hotspots with users.
+  - `cluster_locations_event`: An event that is fired whenever a user clusters their locations. I thought this would be useful to provide some more complex and nuanced information about users travels, such as how popular locations are grouped in relation to each other e.g it could be useful to know that Big Ben and the London Eye are popular locations that are very near to each other to provide some sort of tie in tourist deals!
+  
 
 ## Running Clust
 
