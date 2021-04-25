@@ -16,20 +16,12 @@ import java.util.UUID;
  */
 public class TrackerEvents {
 
-    public static void trackAll(Tracker tracker) {
-        trackStructuredEvent(tracker);
-        trackScreenView(tracker);
-        trackUnstructuredEvent(tracker);
-    }
-
-    private static void trackStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+    public static void trackStructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).build());
-        tracker.track(Structured.builder().category("category").action("action").label("label").property("property").value(0.00).timestamp((long) 1433791172).build());
     }
 
     private static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
         tracker.track(ScreenView.builder().name("screenName1").id(UUID.randomUUID().toString()).build());
-        tracker.track(ScreenView.builder().name("screenName2").id(UUID.randomUUID().toString()).timestamp((long) 1433791172).build());
     }
 
     private static void trackUnstructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {

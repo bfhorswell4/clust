@@ -29,6 +29,7 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
+import com.snowplowanalytics.snowplow.tracker.events.Structured;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             BitmapDescriptorFactory.HUE_YELLOW};
 
     private GoogleMap mMap;
+    private Tracker tracker;
     FloatingActionButton addLocationButton;
     FloatingActionButton clusterLocationsButton;
     FloatingActionButton resetButton;
@@ -72,8 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currLocations = new ArrayList<>();
 
         // Initialise Snowplow Tracking
-        Tracker tracker = SnowplowTrackerBuilder.getTracker(this.getApplicationContext());
-        TrackerEvents.trackAll(tracker);
+        tracker = SnowplowTrackerBuilder.getTracker(this.getApplicationContext());
 
     }
 
@@ -130,6 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Handles a user clicking the add location button
      */
     private void handleAddLocationClick(){
+        TrackerEvents.trackStructuredEvent(tracker);
         Log.i(TAG, "Add Location Button Clicked");
 
         // Set fields for what type of place data should be returned on user selection
