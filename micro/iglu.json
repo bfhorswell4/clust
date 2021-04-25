@@ -19,7 +19,7 @@
         "vendorPrefixes": [ "test.example.iglu" ],
         "connection": {
           "http": {
-            "uri": "https://raw.githubusercontent.com/bfhorswell4/clust/snowplow-analytics/iglu"
+            "uri": "http://github.com/bfhorswell4/clust/tree/snowplow-analytics/iglu"
           }
         }
       }
