@@ -1,5 +1,6 @@
 package com.example.clust;
 
+import com.google.android.libraries.places.api.model.Place;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
 import com.snowplowanalytics.snowplow.tracker.events.SelfDescribing;
@@ -24,11 +25,10 @@ public class TrackerEvents {
         tracker.track(ScreenView.builder().name("screenName1").id(UUID.randomUUID().toString()).build());
     }
 
-    private static void trackUnstructuredEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
+    public static void trackAddLocationEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker, Place place) {
         Map<String, String> attributes = new HashMap<>();
-        attributes.put("targetUrl", "http://a-target-url.com");
+        attributes.put("latlngCoords", place.getLatLng().toString());
         SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", attributes);
         tracker.track(SelfDescribing.builder().eventData(test).build());
-        tracker.track(SelfDescribing.builder().eventData(test).timestamp((long) 1433791172).build());
     }
 }

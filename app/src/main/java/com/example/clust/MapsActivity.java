@@ -92,6 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (resultCode == RESULT_OK) {
                 // Result succeeded, adding location to map
                 Place place = Autocomplete.getPlaceFromIntent(data);
+                TrackerEvents.trackAddLocationEvent(tracker, place);
                 currLocations.add(place.getLatLng());
                 mMap.addMarker(new MarkerOptions()
                         .position(place.getLatLng())
@@ -131,7 +132,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Handles a user clicking the add location button
      */
     private void handleAddLocationClick(){
-        TrackerEvents.trackStructuredEvent(tracker);
         Log.i(TAG, "Add Location Button Clicked");
 
         // Set fields for what type of place data should be returned on user selection
