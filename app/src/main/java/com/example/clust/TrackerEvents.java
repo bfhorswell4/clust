@@ -27,8 +27,8 @@ public class TrackerEvents {
 
     public static void trackAddLocationEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker, Place place) {
         Map<String, String> attributes = new HashMap<>();
-        attributes.put("type", "add");
-        SelfDescribingJson test = new SelfDescribingJson("iglu:test.example.iglu/cart_action_event/jsonschema/1-0-0", attributes);
+        attributes.put("locationName", place.getLatLng().toString());
+        SelfDescribingJson test = new SelfDescribingJson("iglu:test.example.iglu/add_location_event/jsonschema/1-0-0", attributes);
         tracker.track(SelfDescribing.builder().eventData(test).build());
     }
 }
