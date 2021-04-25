@@ -2,6 +2,7 @@ package com.example.clust;
 
 import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.model.Place;
 
 import java.util.ArrayList;
 
@@ -16,7 +17,7 @@ public class KMeansClusterer {
      * @param k The amount of clusters to generate
      * @return An ArrayList of Cluster objects
      */
-    public static ArrayList<Cluster> clusterLocations(ArrayList<LatLng> locations, int k) {
+    public static ArrayList<Cluster> clusterLocations(ArrayList<Place> locations, int k) {
         // Initially each cluster is made from a single location
         ArrayList<Cluster> clusters = new ArrayList<>();
         for (int i = 0; i < locations.size(); i++) {

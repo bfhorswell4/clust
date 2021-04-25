@@ -49,7 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     FloatingActionButton addLocationButton;
     FloatingActionButton clusterLocationsButton;
     FloatingActionButton resetButton;
-    private ArrayList<LatLng> currLocations;
+    private ArrayList<Place> currLocations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +93,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Result succeeded, adding location to map
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 TrackerEvents.trackAddLocationEvent(tracker, place);
-                currLocations.add(place.getLatLng());
+                currLocations.add(place);
                 mMap.addMarker(new MarkerOptions()
                         .position(place.getLatLng())
                         .title("Marker"));
@@ -173,11 +173,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     // For each of our clusters, associate a colour with it and add the locations to the map
                     for(int c = 0; c < clusters.size(); c++){
-                        ArrayList<LatLng> locs = clusters.get(c).getLocations();
+                        ArrayList<Place> locs = clusters.get(c).getLocations();
                         float colour = marker_colours[c];
                         for(int l = 0; l < locs.size(); l++){
                             mMap.addMarker(new MarkerOptions()
-                                    .position(locs.get(l))
+                                    .position(locs.get(l).getLatLng())
                                     .icon(BitmapDescriptorFactory.defaultMarker(colour)));
                         }
                     }

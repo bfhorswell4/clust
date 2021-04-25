@@ -47,17 +47,19 @@ public class TrackerEvents {
         for(int c = 0; c < clusters.size(); c++){
             Cluster cluster = clusters.get(c);
             HashMap<String, Object> cluster_obj = new HashMap<>();
-            ArrayList<LatLng> locs = clusters.get(c).getLocations();
+            ArrayList<Place> locs = clusters.get(c).getLocations();
             ArrayList<Object> loc_objs = new ArrayList<>();
 
             cluster_obj.put("cluster_center", cluster.getCenter().toString());
 
 
             for(int l = 0; l < locs.size(); l++){
-                LatLng loc = locs.get(l);
+                Place loc = locs.get(l);
                 Map<String, Object> loc_obj = new HashMap<>();
-                loc_obj.put("lat", loc.latitude);
-                loc_obj.put("lng", loc.longitude);
+                loc_obj.put("lat", loc.getLatLng().latitude);
+                loc_obj.put("lng", loc.getLatLng().longitude);
+                loc_obj.put("name", loc.getName());
+                loc_obj.put("address", loc.getAddress());
                 loc_objs.add(loc_obj);
             }
             cluster_obj.put("locations", loc_objs);
