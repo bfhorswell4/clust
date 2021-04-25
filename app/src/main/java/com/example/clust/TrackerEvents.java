@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Utility Class used to send all
- * combinations of Tracker Events.
+ * Utility Class used to hold logic
+ *  for  various Tracker Events.
  */
 public class TrackerEvents {
 
@@ -27,8 +27,8 @@ public class TrackerEvents {
 
     public static void trackAddLocationEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker, Place place) {
         Map<String, String> attributes = new HashMap<>();
-        attributes.put("latlngCoords", place.getLatLng().toString());
-        SelfDescribingJson test = new SelfDescribingJson("iglu:com.snowplowanalytics.snowplow/link_click/jsonschema/1-0-1", attributes);
+        attributes.put("name", place.getName());
+        SelfDescribingJson test = new SelfDescribingJson("iglu:test.example.iglu/add_location_event/jsonschema/1-0-0", attributes);
         tracker.track(SelfDescribing.builder().eventData(test).build());
     }
 }
