@@ -38,31 +38,33 @@ public class TrackerEvents {
 
     public static void trackClusterLocationsEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker, ArrayList<Cluster> clusters) {
         Map<String, ArrayList<Object>> attributes = new HashMap<>();
-        ArrayList<Object> cluster_objs = new ArrayList<>();
+        ArrayList<Object> cluster_maps = new ArrayList<>();
 
         for(int c = 0; c < clusters.size(); c++){
             Cluster cluster = clusters.get(c);
-            HashMap<String, Object> cluster_obj = new HashMap<>();
+            HashMap<String, Object> cluster_map = new HashMap<>();
             ArrayList<Place> locs = clusters.get(c).getLocations();
-            ArrayList<Object> loc_objs = new ArrayList<>();
+            ArrayList<Object> loc_maps = new ArrayList<>();
 
-            cluster_obj.put("cluster_center", cluster.getCenter().toString());
-
+            HashMap<String, Double> center_map = new HashMap<>();
+            center_map.put("lat", cluster.getCenter().latitude);
+            center_map.put("lng", cluster.getCenter().longitude);
+            cluster_map.put("cluster_center", center_map);
 
             for(int l = 0; l < locs.size(); l++){
                 Place loc = locs.get(l);
-                Map<String, Object> loc_obj = new HashMap<>();
-                loc_obj.put("lat", loc.getLatLng().latitude);
-                loc_obj.put("lng", loc.getLatLng().longitude);
-                loc_obj.put("name", loc.getName());
-                loc_obj.put("address", loc.getAddress());
-                loc_objs.add(loc_obj);
+                Map<String, Object> loc_map = new HashMap<>();
+                loc_map.put("lat", loc.getLatLng().latitude);
+                loc_map.put("lng", loc.getLatLng().longitude);
+                loc_map.put("name", loc.getName());
+                loc_map.put("address", loc.getAddress());
+                loc_maps.add(loc_map);
             }
-            cluster_obj.put("locations", loc_objs);
-            cluster_objs.add(cluster_obj);
+            cluster_map.put("locations", loc_maps);
+            cluster_maps.add(cluster_map);
         }
 
-        attributes.put("clusters", cluster_objs);
+        attributes.put("clusters", cluster_maps);
         SelfDescribingJson test = new SelfDescribingJson("iglu:test.example.iglu/cluster_locations_event/json_schema/1-0-0", attributes);
         tracker.track(SelfDescribing.builder().eventData(test).build());
     }

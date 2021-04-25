@@ -18,7 +18,19 @@
           "type": "object",
           "properties": {
             "cluster_center": {
-              "type": "string"
+              "type": "object",
+              "properties": {
+                "lat": {
+                  "type": "number",
+                  "maximum": 90,
+                  "minimum": -90
+                },
+                "lng": {
+                  "type": "number",
+                  "maximum": 180,
+                  "minimum": -180
+                }
+              }
             },
             "locations": {
               "type": "array",
