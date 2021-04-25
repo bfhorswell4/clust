@@ -19,7 +19,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -28,8 +27,6 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
-import com.snowplowanalytics.snowplow.tracker.events.ScreenView;
-import com.snowplowanalytics.snowplow.tracker.events.Structured;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,10 +43,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private Tracker tracker;
+    private ArrayList<Place> currLocations;
+
     FloatingActionButton addLocationButton;
     FloatingActionButton clusterLocationsButton;
     FloatingActionButton resetButton;
-    private ArrayList<Place> currLocations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +71,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         currLocations = new ArrayList<>();
 
-        // Initialise Snowplow Tracking
+        // Initialise Snowplow tracking
         tracker = SnowplowTrackerBuilder.getTracker(this.getApplicationContext());
-
     }
 
     /**
@@ -88,19 +85,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        // Handle our autocomplete response from a location adding attempt
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // Result succeeded, adding location to map
-                Place place = Autocomplete.getPlaceFromIntent(data);
-                TrackerEvents.trackAddLocationEvent(tracker, place);
-                currLocations.add(place);
+                Place location = Autocomplete.getPlaceFromIntent(data);
+                TrackerEvents.trackAddLocationEvent(tracker, location);
+                currLocations.add(location);
+
                 mMap.addMarker(new MarkerOptions()
-                        .position(place.getLatLng())
+                        .position(location.getLatLng())
                         .title("Marker"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 5));
-                Log.i(TAG, "Location Added: " + place.getLatLng().toString() + "," + place.getAddress());
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location.getLatLng(), 5));
+
+                Log.i(TAG, "Location Added: " + location.getLatLng().toString() + "," + location.getAddress());
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                // Handle the error
+                // Result threw error
                 Status status = Autocomplete.getStatusFromIntent(data);
                 Log.e(TAG, status.getStatusMessage());
             }
@@ -110,7 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * A generic handler to handle different onClick events for specific Buttons
+     * A generic handler to handle different onClick events for various buttons
      */
     @Override
     public void onClick(View v) {
@@ -150,7 +150,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void handleClusterLocationsClick(){
         Log.i(TAG, "Cluster Locations button clicked");
 
-        // Create a dialog with a numerical input for setting cluster number
+        // Create a dialog with a numerical input for setting cluster amount
         AlertDialog.Builder dialog = new AlertDialog.Builder(MapsActivity.this);
         dialog.setTitle("How many days long is your trip?");
         final EditText numberInput = new EditText(MapsActivity.this);
@@ -165,7 +165,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i(TAG, "Cluster Count in Numerical Input: " + clusterCount);
 
                 if(clusterCount > 8 || clusterCount < 1){
-                    Toast.makeText(getApplicationContext(), "Enter a number of days between 1 and 8", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),
+                            "Enter a number of days between 1 and 8", Toast.LENGTH_LONG).show();
                 }else{
                     mMap.clear();
                     ArrayList<Cluster> clusters = KMeansClusterer.clusterLocations(currLocations, clusterCount);
@@ -175,6 +176,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     for(int c = 0; c < clusters.size(); c++){
                         ArrayList<Place> locs = clusters.get(c).getLocations();
                         float colour = marker_colours[c];
+
                         for(int l = 0; l < locs.size(); l++){
                             mMap.addMarker(new MarkerOptions()
                                     .position(locs.get(l).getLatLng())

@@ -4,11 +4,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.libraries.places.api.model.Place;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
- * A class that represents a grouping of LatLng locations
+ * A class that represents a grouping of Place locations
  */
 public class Cluster {
     private ArrayList<Place> locations;
@@ -16,7 +15,7 @@ public class Cluster {
 
     /**
      * Initialises a Cluster
-     * @param location An initial single location that defines the cluster
+     * @param location An initial location that defines the cluster
      */
     public Cluster(Place location){
         locations = new ArrayList<>();
@@ -42,8 +41,8 @@ public class Cluster {
     }
 
     /**
-     * A getter for the clusters locations
-     * @return The locations associated with the cluster
+     * A getter for the cluster's locations
+     * @return The locations associated with this cluster
      */
     public ArrayList<Place> getLocations(){
         return this.locations;

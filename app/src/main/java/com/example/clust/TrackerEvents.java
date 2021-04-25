@@ -15,17 +15,13 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Utility Class used to hold logic
- *  for  various Tracker Events.
+ * A utility Class used to hold logic
+ *  for various Tracker Events.
  */
 public class TrackerEvents {
 
     public static void trackResetMapEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker, int amountOfLocations) {
         tracker.track(Structured.builder().category("Map").action("Resetting Locations").value((double)amountOfLocations).build());
-    }
-
-    public static void trackScreenView(com.snowplowanalytics.snowplow.tracker.Tracker tracker) {
-        tracker.track(ScreenView.builder().name("MapActivityScreen").id(UUID.randomUUID().toString()).build());
     }
 
     public static void trackAddLocationEvent(com.snowplowanalytics.snowplow.tracker.Tracker tracker, Place place) {
